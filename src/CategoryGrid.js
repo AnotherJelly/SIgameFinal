@@ -138,14 +138,15 @@ function Timer({timer, isTimerPaused}) {
     return <div className="timer">{time}</div>;
 }
 
-function useRoundIntro(activeRoundIndex, pause) {
+function useRoundIntro(roundIntroText, pause) {
     const [showIntro, setShowIntro] = useState(true);
 
     useEffect(() => {
         setShowIntro(true);
+        if (roundIntroText === "Конец игры") return;
         const t = setTimeout(() => setShowIntro(false), pause);
         return () => clearTimeout(t);
-    }, [activeRoundIndex, pause]);
+    }, [roundIntroText, pause]);
 
     return showIntro;
 }
@@ -163,7 +164,7 @@ export default function CategoryGrid({ playersData, rounds, onAwardPoints, onDed
 
     const [activeRoundIndex, setActiveRoundIndex] = useState(0);
     const [roundIntroText, setRoundIntroText] = useState('Раунд 1');
-    const showRoundIntro = useRoundIntro(activeRoundIndex, settingsApp.roundIntroPause);
+    const showRoundIntro = useRoundIntro(roundIntroText, settingsApp.roundIntroPause);
 
     const [isTimerPaused, setIsTimerPaused] = useState(false);
 
@@ -199,6 +200,7 @@ export default function CategoryGrid({ playersData, rounds, onAwardPoints, onDed
         if (allAnswered && activeRoundIndex < rounds.length - 1) {
             nextRound();
         } else if (allAnswered && activeRoundIndex == rounds.length - 1) {
+            setActiveRoundIndex(idx => idx + 1);
             setRoundIntroText(`Конец игры`);
         }
     }, [currentRoundQuestions, answeredQuestions, activeRoundIndex, rounds, nextRound, setRoundIntroText]);
